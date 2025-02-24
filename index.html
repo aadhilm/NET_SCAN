@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Scanner Web Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e2f;
+            color: #ffffff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            background-color: #1e1e2f;
+            color: #00ff7f;
+            border: 1px solid #3e3e56;
+            padding: 10px;
+            font-family: "Courier", monospace;
+        }
+        button {
+            background-color: #3e3e56;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #5e5e76;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Network Scanner Web Interface</h1>
+        <textarea id="output" readonly></textarea>
+        <div>
+            <button onclick="startScan()">Start Scan</button>
+            <button onclick="stopScan()">Stop Scan</button>
+        </div>
+    </div>
+
+    <script>
+        function startScan() {
+            const networkPrefix = "192.168.1"; // Default value
+            const ipRange = "1-254"; // Default value
+            fetch("/start_scan", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ network_prefix: networkPrefix, ip_range: ipRange }),
+            }).then(response => response.json())
+              .then(data => console.log(data));
+        }
+
+        function stopScan() {
+            fetch("/stop_scan", {
+                method: "POST",
+            }).then(response => response.json())
+              .then(data => console.log(data));
+        }
+
+        function updateOutput() {
+            fetch("/get_output")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("output").value = data.output;
+                });
+        }
+
+        // Update output every 2 seconds
+        setInterval(updateOutput, 2000);
+    </script>
+</body>
+</html>
